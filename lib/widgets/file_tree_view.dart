@@ -86,46 +86,20 @@ class FileTreeView extends StatelessWidget {
             ),
             const Divider(height: 1),
 
-            // Danh sách cây thư mục phân theo Kỳ học
+            // Danh sách cây thư mục phân theo Kỳ học (Custom Collapsible Tree, no ListTile)
             Expanded(
               child: ListView.builder(
                 itemCount: grouped.keys.length,
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 itemBuilder: (context, index) {
                   final folderName = grouped.keys.elementAt(index);
                   final folderNotes = grouped[folderName]!;
 
-                  return Theme(
-                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                    child: ExpansionTile(
-                      initiallyExpanded: true,
-                      leading: Icon(
-                        folderName.contains('Kỳ') ? Icons.school_outlined : Icons.folder_outlined,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      title: Text(
-                        folderName,
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                      ),
-                      trailing: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          '${folderNotes.length}',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                      children: folderNotes.map((note) {
-                        final isSelected = note.path == provider.selectedNote?.path;
-                        return _buildNoteItem(context, provider, note, isSelected);
-                      }).toList(),
-                    ),
+                  return _FolderGroup(
+                    key: ValueKey('folder_$folderName'),
+                    folderName: folderName,
+                    folderNotes: folderNotes,
+                    provider: provider,
                   );
                 },
               ),
@@ -133,6 +107,98 @@ class FileTreeView extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _FolderGroup extends StatefulWidget {
+  final String folderName;
+  final List<NoteFile> folderNotes;
+  final NoteProvider provider;
+
+  const _FolderGroup({
+    super.key,
+    required this.folderName,
+    required this.folderNotes,
+    required this.provider,
+  });
+
+  @override
+  State<_FolderGroup> createState() => _FolderGroupState();
+}
+
+class _FolderGroupState extends State<_FolderGroup> {
+  bool _isExpanded = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Tiêu đề thư mục / Kỳ học
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(6),
+            onTap: () => setState(() => _isExpanded = !_isExpanded),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              child: Row(
+                children: [
+                  Icon(
+                    _isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                    size: 18,
+                    color: theme.hintColor,
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    widget.folderName.contains('Kỳ') ? Icons.school_outlined : Icons.folder_outlined,
+                    size: 18,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.folderName,
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest.withAlpha(80),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '${widget.folderNotes.length}',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        // Các môn học bên trong thư mục (nếu đang mở)
+        if (_isExpanded)
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: Column(
+              children: widget.folderNotes.map((note) {
+                final isSelected = note.path == widget.provider.selectedNote?.path;
+                return _buildNoteItem(context, widget.provider, note, isSelected);
+              }).toList(),
+            ),
+          ),
+      ],
     );
   }
 
@@ -145,7 +211,8 @@ class FileTreeView extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      key: ValueKey('note_${note.path}'),
+      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: isSelected
             ? theme.colorScheme.primary.withAlpha(40)
@@ -155,45 +222,56 @@ class FileTreeView extends StatelessWidget {
             ? Border.all(color: theme.colorScheme.primary.withAlpha(120), width: 1)
             : null,
       ),
-      child: ListTile(
-        dense: true,
-        visualDensity: const VisualDensity(horizontal: 0, vertical: -2),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-        leading: Icon(
-          Icons.description_outlined,
-          size: 18,
-          color: isSelected ? theme.colorScheme.primary : theme.iconTheme.color?.withAlpha(180),
-        ),
-        title: Text(
-          note.title,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? theme.colorScheme.primary : null,
-          ),
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: note.links.isNotEmpty
-            ? Tooltip(
-                message: '${note.links.length} liên kết [[...]]',
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.secondary.withAlpha(30),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(6),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(6),
+          onTap: () => provider.selectNote(note),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.5),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.description_outlined,
+                  size: 16,
+                  color: isSelected ? theme.colorScheme.primary : theme.iconTheme.color?.withAlpha(180),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
                   child: Text(
-                    '[[${note.links.length}]]',
+                    note.title,
                     style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.secondary,
+                      fontSize: 13,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? theme.colorScheme.primary : null,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              )
-            : null,
-        onTap: () => provider.selectNote(note),
+                if (note.links.isNotEmpty)
+                  Tooltip(
+                    message: '${note.links.length} liên kết [[...]]',
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.secondary.withAlpha(30),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '[[${note.links.length}]]',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.secondary,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

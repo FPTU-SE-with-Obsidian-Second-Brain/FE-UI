@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'providers/chat_provider.dart';
 import 'providers/note_provider.dart';
 import 'screens/home_screen.dart';
 
@@ -13,8 +14,11 @@ class SecondBrainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => NoteProvider()..init(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NoteProvider()..init()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
+      ],
       child: MaterialApp(
         title: 'FPTU SE Second Brain',
         debugShowCheckedModeBanner: false,
