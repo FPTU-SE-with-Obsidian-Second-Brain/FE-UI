@@ -23,6 +23,13 @@ class SecondBrainApp extends StatelessWidget {
         title: 'FPTU SE Second Brain',
         debugShowCheckedModeBanner: false,
         themeMode: ThemeMode.dark,
+        builder: (context, child) {
+          // Bọc ExcludeSemantics tại cấp độ builder cao nhất của MaterialApp
+          // để loại bỏ hoàn toàn việc đồng bộ cây ngữ nghĩa cho Navigator, Overlay, Tooltip và Dialog trên Windows
+          return ExcludeSemantics(
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
         darkTheme: ThemeData(
           useMaterial3: true,
           brightness: Brightness.dark,

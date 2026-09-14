@@ -253,14 +253,15 @@ class _GraphViewDialogState extends State<GraphViewDialog>
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Dialog(
-      backgroundColor: const Color(0xFF0F0F12), // Nền than chì sâu thẳm chuẩn Obsidian
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: const Color(0xFF27272A).withAlpha(120), width: 1),
-      ),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
-      child: ClipRRect(
+    return ExcludeSemantics(
+      child: Dialog(
+        backgroundColor: const Color(0xFF0F0F12), // Nền than chì sâu thẳm chuẩn Obsidian
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: const Color(0xFF27272A).withAlpha(120), width: 1),
+        ),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
+        child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: SizedBox(
           width: 1100,
@@ -572,8 +573,9 @@ class _GraphViewDialogState extends State<GraphViewDialog>
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class _Graph3DPainter extends CustomPainter {
