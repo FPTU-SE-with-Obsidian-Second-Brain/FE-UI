@@ -147,37 +147,59 @@ class Graph3DPainter extends CustomPainter {
       );
 
       // 5. Nhãn tên môn học
+      // Tự động hiển thị nhãn cho TẤT CẢ các môn khi người dùng lăn chuột phóng to (zoom in), giống ảnh 2 của Obsidian
+      double autoLabelOpacity = 0.0;
       if (showLabels || isFocus || isNeighbor) {
-        final textPainter = TextPainter(
-          text: TextSpan(
-            text: node.id,
-            style: TextStyle(
-              color: isFocus
-                  ? Colors.white
-                  : (isNeighbor
-                        ? const Color(0xFFF3E8FF)
-                        : const Color(0xCCFFFFFF)),
-              fontSize: isFocus ? 12.0 : 9.5,
-              fontWeight: isFocus ? FontWeight.bold : FontWeight.w500,
-              shadows: const [
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 4,
-                  offset: Offset(1, 1),
-                ),
-              ],
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout();
+        autoLabelOpacity = 1.0;
+      } else if (zoom > 1.02) {
+        // Tăng dần độ hiển thị mượt mà từ zoom 1.02 lên 1.15
+        autoLabelOpacity = ((zoom - 1.02) / 0.13).clamp(0.0, 1.0);
+      }
 
-        textPainter.paint(
-          canvas,
-          Offset(
-            node.screenX + currentRadius + 3,
-            node.screenY - textPainter.height / 2,
-          ),
-        );
+      if (autoLabelOpacity > 0.05) {
+        // Bỏ qua nhãn nằm ngoài vùng nhìn (viewport culling)
+        if (node.screenX >= -50 &&
+            node.screenX <= size.width + 50 &&
+            node.screenY >= -50 &&
+            node.screenY <= size.height + 50) {
+          final Color textColor;
+          if (isFocus) {
+            textColor = Colors.white;
+          } else if (isNeighbor) {
+            textColor = const Color(0xFFF3E8FF);
+          } else {
+            textColor = Color.fromRGBO(226, 232, 240, 0.88 * autoLabelOpacity);
+          }
+
+          final textPainter = TextPainter(
+            text: TextSpan(
+              text: node.id,
+              style: TextStyle(
+                color: textColor,
+                fontSize: isFocus ? 12.0 : 9.5,
+                fontWeight: isFocus ? FontWeight.bold : FontWeight.w500,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withAlpha(
+                      (230 * autoLabelOpacity).toInt().clamp(0, 255),
+                    ),
+                    blurRadius: 3,
+                    offset: const Offset(1, 1),
+                  ),
+                ],
+              ),
+            ),
+            textDirection: TextDirection.ltr,
+          )..layout();
+
+          textPainter.paint(
+            canvas,
+            Offset(
+              node.screenX + currentRadius + 4,
+              node.screenY - textPainter.height / 2,
+            ),
+          );
+        }
       }
     }
   }
