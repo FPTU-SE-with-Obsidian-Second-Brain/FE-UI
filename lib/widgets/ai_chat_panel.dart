@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import '../models/chat_message.dart';
@@ -15,6 +16,12 @@ class AiChatPanel extends StatefulWidget {
 class _AiChatPanelState extends State<AiChatPanel> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
+
+  // Kích thước chiều rộng của khung chat có thể điều chỉnh
+  double _chatWidth = 420.0;
+  bool _isDragging = false;
+  bool _isHoveringResizeHandle = false;
 
   final List<String> _suggestions = [
     'Môn CSD201 học những gì?',
@@ -26,6 +33,7 @@ class _AiChatPanelState extends State<AiChatPanel> {
   void dispose() {
     _controller.dispose();
     _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -48,12 +56,45 @@ class _AiChatPanelState extends State<AiChatPanel> {
     _controller.clear();
     provider.sendMessage(text);
     _scrollToBottom();
+    _focusNode.requestFocus();
+  }
+
+  void _copyToClipboard(String text, String messageType) {
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check_circle, color: Color(0xFF34D399), size: 16),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Đã sao chép $messageType vào bộ nhớ tạm',
+                style: const TextStyle(fontSize: 12.5),
+              ),
+            ),
+          ],
+        ),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        width: 300,
+        backgroundColor: const Color(0xFF1E1E24),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: Color(0xFF3F3F46)),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxAllowedWidth = (screenWidth * 0.85).clamp(450.0, 1100.0);
 
     return Consumer<ChatProvider>(
       builder: (context, chatProvider, _) {
@@ -61,155 +102,246 @@ class _AiChatPanelState extends State<AiChatPanel> {
         _scrollToBottom();
 
         return Container(
-          width: 380,
+          width: _chatWidth.clamp(320.0, maxAllowedWidth),
           decoration: BoxDecoration(
             color: colorScheme.surface,
             border: Border(
               left: BorderSide(color: theme.dividerColor, width: 1),
             ),
           ),
-          child: Column(
+          child: Row(
             children: [
-              // 1. Header khung Chat
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withAlpha(50),
-                  border: Border(
-                    bottom: BorderSide(color: theme.dividerColor, width: 1),
+              // Thanh kéo co giãn kích thước khung chat (Draggable Resize Handle)
+              MouseRegion(
+                cursor: SystemMouseCursors.resizeColumn,
+                onEnter: (_) => setState(() => _isHoveringResizeHandle = true),
+                onExit: (_) => setState(() => _isHoveringResizeHandle = false),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onHorizontalDragStart: (_) {
+                    setState(() => _isDragging = true);
+                  },
+                  onHorizontalDragUpdate: (details) {
+                    setState(() {
+                      // Kéo sang trái (delta.dx < 0) => tăng chiều rộng
+                      // Kéo sang phải (delta.dx > 0) => giảm chiều rộng
+                      _chatWidth = (_chatWidth - details.delta.dx)
+                          .clamp(320.0, maxAllowedWidth);
+                    });
+                  },
+                  onHorizontalDragEnd: (_) {
+                    setState(() => _isDragging = false);
+                  },
+                  onDoubleTap: () {
+                    // Nhấp đúp để chuyển nhanh giữa kích thước chuẩn (420px) và rộng (680px)
+                    setState(() {
+                      _chatWidth = _chatWidth > 550 ? 420.0 : 680.0;
+                    });
+                  },
+                  child: Container(
+                    width: 7,
+                    color: (_isDragging || _isHoveringResizeHandle)
+                        ? colorScheme.primary.withAlpha(50)
+                        : Colors.transparent,
+                    child: Center(
+                      child: Container(
+                        width: 2.5,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: (_isDragging || _isHoveringResizeHandle)
+                              ? colorScheme.primary
+                              : theme.dividerColor.withAlpha(160),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                child: Row(
+              ),
+
+              // Nội dung chính của khung chat
+              Expanded(
+                child: Column(
                   children: [
+                    // 1. Header khung Chat
                     Container(
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withAlpha(35),
-                        borderRadius: BorderRadius.circular(8),
+                        color: colorScheme.surfaceContainerHighest.withAlpha(50),
+                        border: Border(
+                          bottom: BorderSide(color: theme.dividerColor, width: 1),
+                        ),
                       ),
-                      child: Icon(Icons.auto_awesome, color: colorScheme.primary, size: 18),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          const Text(
-                            'Trợ lý AI (FPTU RAG)',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary.withAlpha(35),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(Icons.auto_awesome, color: colorScheme.primary, size: 18),
                           ),
-                          Text(
-                            'Backend: http://127.0.0.1:8000',
-                            style: TextStyle(fontSize: 11, color: theme.hintColor),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Trợ lý AI (FPTU RAG)',
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  'Backend: http://127.0.0.1:8000',
+                                  style: TextStyle(fontSize: 11, color: theme.hintColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Nút phóng to / thu nhỏ nhanh kích thước
+                          IconButton(
+                            tooltip: _chatWidth > 550
+                                ? 'Thu nhỏ chiều rộng (420px)'
+                                : 'Mở rộng chiều rộng (680px)',
+                            icon: Icon(
+                              _chatWidth > 550
+                                  ? Icons.close_fullscreen_rounded
+                                  : Icons.open_in_full_rounded,
+                              size: 18,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _chatWidth = _chatWidth > 550 ? 420.0 : 680.0;
+                              });
+                            },
+                          ),
+                          IconButton(
+                            tooltip: 'Xóa lịch sử chat',
+                            icon: const Icon(Icons.delete_outline, size: 20),
+                            onPressed: chatProvider.messages.length > 1
+                                ? () => chatProvider.clearHistory()
+                                : null,
+                          ),
+                          IconButton(
+                            tooltip: 'Đóng khung chat',
+                            icon: const Icon(Icons.close, size: 20),
+                            onPressed: () => chatProvider.closeChat(),
                           ),
                         ],
                       ),
                     ),
-                    IconButton(
-                      tooltip: 'Xóa lịch sử chat',
-                      icon: const Icon(Icons.delete_outline, size: 20),
-                      onPressed: chatProvider.messages.length > 1
-                          ? () => chatProvider.clearHistory()
-                          : null,
-                    ),
-                    IconButton(
-                      tooltip: 'Đóng khung chat',
-                      icon: const Icon(Icons.close, size: 20),
-                      onPressed: () => chatProvider.closeChat(),
-                    ),
-                  ],
-                ),
-              ),
 
-              // 2. Danh sách tin nhắn
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(12),
-                  itemCount: chatProvider.messages.length + (chatProvider.isLoading ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == chatProvider.messages.length) {
-                      return _buildLoadingBubble(context);
-                    }
-                    final message = chatProvider.messages[index];
-                    return _buildMessageBubble(context, message);
-                  },
-                ),
-              ),
-
-              // 3. Thanh gợi ý câu hỏi nhanh
-              if (chatProvider.messages.length <= 2 && !chatProvider.isLoading)
-                Container(
-                  height: 38,
-                  margin: const EdgeInsets.only(bottom: 6),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    itemCount: _suggestions.length,
-                    itemBuilder: (context, index) {
-                      final item = _suggestions[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 6),
-                        child: ActionChip(
-                          visualDensity: VisualDensity.compact,
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
-                          label: Text(item, style: const TextStyle(fontSize: 11.5)),
-                          onPressed: () => _handleSend(chatProvider, item),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-              // 4. Thanh gõ câu hỏi (Input Bar)
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withAlpha(40),
-                  border: Border(
-                    top: BorderSide(color: theme.dividerColor, width: 1),
-                  ),
-                ),
-                child: Row(
-                  children: [
+                    // 2. Danh sách tin nhắn
                     Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        minLines: 1,
-                        maxLines: 3,
-                        style: const TextStyle(fontSize: 13),
-                        decoration: InputDecoration(
-                          hintText: 'Hỏi về môn học FPTU... (Enter để gửi)',
-                          hintStyle: TextStyle(fontSize: 12.5, color: theme.hintColor),
-                          isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          filled: true,
-                          fillColor: colorScheme.surfaceContainerHighest.withAlpha(100),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        onSubmitted: (_) => _handleSend(chatProvider),
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.all(12),
+                        itemCount: chatProvider.messages.length + (chatProvider.isLoading ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index == chatProvider.messages.length) {
+                            return _buildLoadingBubble(context);
+                          }
+                          final message = chatProvider.messages[index];
+                          return _buildMessageBubble(context, message);
+                        },
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    IconButton.filled(
-                      style: IconButton.styleFrom(
-                        backgroundColor: colorScheme.primary,
-                        foregroundColor: Colors.white,
-                      ),
-                      icon: chatProvider.isLoading
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
+
+                    // 3. Thanh gợi ý câu hỏi nhanh
+                    if (chatProvider.messages.length <= 2 && !chatProvider.isLoading)
+                      Container(
+                        height: 38,
+                        margin: const EdgeInsets.only(bottom: 6),
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          itemCount: _suggestions.length,
+                          itemBuilder: (context, index) {
+                            final item = _suggestions[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: ActionChip(
+                                visualDensity: VisualDensity.compact,
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+                                label: Text(item, style: const TextStyle(fontSize: 11.5)),
+                                onPressed: () => _handleSend(chatProvider, item),
                               ),
-                            )
-                          : const Icon(Icons.send_rounded, size: 18),
-                      onPressed: chatProvider.isLoading ? null : () => _handleSend(chatProvider),
+                            );
+                          },
+                        ),
+                      ),
+
+                    // 4. Thanh gõ câu hỏi (Input Bar với Enter để gửi)
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest.withAlpha(40),
+                        border: Border(
+                          top: BorderSide(color: theme.dividerColor, width: 1),
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: Focus(
+                              onKeyEvent: (node, event) {
+                                if (event is KeyDownEvent &&
+                                    event.logicalKey == LogicalKeyboardKey.enter) {
+                                  if (HardwareKeyboard.instance.isShiftPressed) {
+                                    // Shift + Enter: Xuống dòng bình thường
+                                    return KeyEventResult.ignored;
+                                  } else {
+                                    // Nhấn Enter: Gửi tin nhắn ngay lập tức mà không cần nhấn button send
+                                    _handleSend(chatProvider);
+                                    return KeyEventResult.handled;
+                                  }
+                                }
+                                return KeyEventResult.ignored;
+                              },
+                              child: TextField(
+                                controller: _controller,
+                                focusNode: _focusNode,
+                                minLines: 1,
+                                maxLines: 4,
+                                textInputAction: TextInputAction.send,
+                                style: const TextStyle(fontSize: 13),
+                                decoration: InputDecoration(
+                                  hintText: 'Hỏi về môn học FPTU... (Enter để gửi, Shift+Enter xuống dòng)',
+                                  hintStyle: TextStyle(fontSize: 12, color: theme.hintColor),
+                                  isDense: true,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                  filled: true,
+                                  fillColor: colorScheme.surfaceContainerHighest.withAlpha(100),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                ),
+                                onSubmitted: (_) => _handleSend(chatProvider),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton.filled(
+                            style: IconButton.styleFrom(
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: Colors.white,
+                            ),
+                            icon: chatProvider.isLoading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.send_rounded, size: 18),
+                            onPressed: chatProvider.isLoading ? null : () => _handleSend(chatProvider),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -268,10 +400,70 @@ class _AiChatPanelState extends State<AiChatPanel> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Thanh phụ phía trên bong bóng: Nhãn người gửi + Nút COPY tin nhắn
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        isUser ? 'Bạn' : 'Trợ lý AI (FPTU)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: isUser
+                              ? Colors.white.withAlpha(200)
+                              : colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Nút copy tin nhắn vào clipboard
+                      Tooltip(
+                        message: 'Sao chép tin nhắn',
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(4),
+                          onTap: () => _copyToClipboard(
+                            message.text,
+                            isUser ? 'câu hỏi' : 'câu trả lời',
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.copy_rounded,
+                                  size: 11.5,
+                                  color: isUser
+                                      ? Colors.white.withAlpha(200)
+                                      : theme.hintColor,
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  'Copy',
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    color: isUser
+                                        ? Colors.white.withAlpha(200)
+                                        : theme.hintColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+
+                  // Nội dung tin nhắn (cho phép chọn & bôi đen copy)
                   if (isUser)
-                    Text(
+                    SelectableText(
                       message.text,
-                      style: const TextStyle(fontSize: 13, color: Colors.white),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white,
+                        height: 1.4,
+                      ),
                     )
                   else
                     MarkdownBody(
