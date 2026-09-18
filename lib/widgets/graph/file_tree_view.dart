@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/note_file.dart';
-import '../providers/note_provider.dart';
+import '../../models/note_file.dart';
+import '../../providers/note_provider.dart';
 
 class FileTreeView extends StatelessWidget {
   const FileTreeView({super.key});
@@ -17,7 +17,10 @@ class FileTreeView extends StatelessWidget {
               children: [
                 CircularProgressIndicator(),
                 SizedBox(height: 12),
-                Text('Đang quét thư mục .md...', style: TextStyle(color: Colors.grey)),
+                Text(
+                  'Đang quét thư mục .md...',
+                  style: TextStyle(color: Colors.grey),
+                ),
               ],
             ),
           );
@@ -60,7 +63,10 @@ class FileTreeView extends StatelessWidget {
           children: [
             // Ô tìm kiếm nhanh
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 8.0,
+              ),
               child: TextField(
                 onChanged: (value) => provider.setSearchQuery(value),
                 style: const TextStyle(fontSize: 13),
@@ -75,8 +81,13 @@ class FileTreeView extends StatelessWidget {
                       : null,
                   isDense: true,
                   filled: true,
-                  fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha(80),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  fillColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest.withAlpha(80),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -149,13 +160,17 @@ class _FolderGroupState extends State<_FolderGroup> {
               child: Row(
                 children: [
                   Icon(
-                    _isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                    _isExpanded
+                        ? Icons.keyboard_arrow_down
+                        : Icons.keyboard_arrow_right,
                     size: 18,
                     color: theme.hintColor,
                   ),
                   const SizedBox(width: 4),
                   Icon(
-                    widget.folderName.contains('Kỳ') ? Icons.school_outlined : Icons.folder_outlined,
+                    widget.folderName.contains('Kỳ')
+                        ? Icons.school_outlined
+                        : Icons.folder_outlined,
                     size: 18,
                     color: colorScheme.primary,
                   ),
@@ -163,12 +178,18 @@ class _FolderGroupState extends State<_FolderGroup> {
                   Expanded(
                     child: Text(
                       widget.folderName,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13.5,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1.5,
+                    ),
                     decoration: BoxDecoration(
                       color: colorScheme.surfaceContainerHighest.withAlpha(80),
                       borderRadius: BorderRadius.circular(10),
@@ -193,8 +214,14 @@ class _FolderGroupState extends State<_FolderGroup> {
             padding: const EdgeInsets.only(left: 12.0),
             child: Column(
               children: widget.folderNotes.map((note) {
-                final isSelected = note.path == widget.provider.selectedNote?.path;
-                return _buildNoteItem(context, widget.provider, note, isSelected);
+                final isSelected =
+                    note.path == widget.provider.selectedNote?.path;
+                return _buildNoteItem(
+                  context,
+                  widget.provider,
+                  note,
+                  isSelected,
+                );
               }).toList(),
             ),
           ),
@@ -219,7 +246,10 @@ class _FolderGroupState extends State<_FolderGroup> {
             : Colors.transparent,
         borderRadius: BorderRadius.circular(6),
         border: isSelected
-            ? Border.all(color: theme.colorScheme.primary.withAlpha(120), width: 1)
+            ? Border.all(
+                color: theme.colorScheme.primary.withAlpha(120),
+                width: 1,
+              )
             : null,
       ),
       child: Material(
@@ -235,7 +265,9 @@ class _FolderGroupState extends State<_FolderGroup> {
                 Icon(
                   Icons.description_outlined,
                   size: 16,
-                  color: isSelected ? theme.colorScheme.primary : theme.iconTheme.color?.withAlpha(180),
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.iconTheme.color?.withAlpha(180),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -243,7 +275,9 @@ class _FolderGroupState extends State<_FolderGroup> {
                     note.title,
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                       color: isSelected ? theme.colorScheme.primary : null,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -253,7 +287,10 @@ class _FolderGroupState extends State<_FolderGroup> {
                   Tooltip(
                     message: '${note.links.length} liên kết [[...]]',
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.secondary.withAlpha(30),
                         borderRadius: BorderRadius.circular(4),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/graph_node_3d.dart';
+import '../../models/graph_node_3d.dart';
 
 /// Widget hiển thị danh sách môn tiên quyết và liên kết sơ đồ tri thức
 class CoursePrerequisitesView extends StatelessWidget {
@@ -58,11 +58,7 @@ class CoursePrerequisitesView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.link,
-                      size: 12,
-                      color: colorScheme.secondary,
-                    ),
+                    Icon(Icons.link, size: 12, color: colorScheme.secondary),
                     const SizedBox(width: 4),
                     Text(
                       '[[$link]]',

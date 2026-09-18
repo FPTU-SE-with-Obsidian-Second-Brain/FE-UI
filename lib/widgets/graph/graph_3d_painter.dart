@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import '../models/graph_node_3d.dart';
+import '../../models/graph_node_3d.dart';
 
 /// CustomPainter chiếu và vẽ mạng lưới đồ thị tri thức 3D trong không gian Obsidian
 class Graph3DPainter extends CustomPainter {

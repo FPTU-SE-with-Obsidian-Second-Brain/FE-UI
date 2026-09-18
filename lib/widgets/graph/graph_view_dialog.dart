@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
-import '../models/graph_node_3d.dart';
-import '../models/note_file.dart';
-import '../providers/note_provider.dart';
-import '../utils/graph_3d_physics.dart';
+import '../../models/graph_node_3d.dart';
+import '../../models/note_file.dart';
+import '../../providers/note_provider.dart';
+import '../../utils/graph_3d_physics.dart';
 import 'graph_3d_painter.dart';
 import 'graph_course_side_panel.dart';
 import 'graph_view_toolbar.dart';
 
 // Re-export models for backward compatibility with existing tests & consumers
-export '../models/course_metadata.dart';
-export '../models/graph_node_3d.dart';
+export '../../models/course_metadata.dart';
+export '../../models/graph_node_3d.dart';
 
 class GraphViewDialog extends StatefulWidget {
   const GraphViewDialog({super.key});
@@ -124,7 +124,10 @@ class _GraphViewDialogState extends State<GraphViewDialog>
         backgroundColor: const Color(0xFF0F0F12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: const Color(0xFF27272A).withAlpha(120), width: 1),
+          side: BorderSide(
+            color: const Color(0xFF27272A).withAlpha(120),
+            width: 1,
+          ),
         ),
         insetPadding: const EdgeInsets.all(20),
         child: ClipRRect(
@@ -143,8 +146,12 @@ class _GraphViewDialogState extends State<GraphViewDialog>
                           onPointerSignal: (e) {
                             if (e is PointerScrollEvent) {
                               setState(() {
-                                _zoom = (_zoom * (e.scrollDelta.dy > 0 ? 0.92 : 1.08))
-                                    .clamp(0.35, 4.0);
+                                _zoom =
+                                    (_zoom *
+                                            (e.scrollDelta.dy > 0
+                                                ? 0.92
+                                                : 1.08))
+                                        .clamp(0.35, 4.0);
                               });
                             }
                           },
@@ -154,7 +161,8 @@ class _GraphViewDialogState extends State<GraphViewDialog>
                                 : SystemMouseCursors.grab,
                             onHover: (e) => _onHover(e.localPosition),
                             child: GestureDetector(
-                              onPanStart: (_) => setState(() => _autoRotate = false),
+                              onPanStart: (_) =>
+                                  setState(() => _autoRotate = false),
                               onPanUpdate: (d) {
                                 setState(() {
                                   _rotY += d.delta.dx * 0.006;
@@ -162,7 +170,9 @@ class _GraphViewDialogState extends State<GraphViewDialog>
                                 });
                               },
                               onTap: () {
-                                if (_hoveredNode != null) _onNodeSelected(_hoveredNode!);
+                                if (_hoveredNode != null) {
+                                  _onNodeSelected(_hoveredNode!);
+                                }
                               },
                               child: CustomPaint(
                                 painter: Graph3DPainter(
@@ -195,12 +205,19 @@ class _GraphViewDialogState extends State<GraphViewDialog>
                           showLabels: _showLabels,
                           colorBySemester: _colorBySemester,
                           isNodeSelected: _selectedNode != null,
-                          onToggleAutoRotate: () => setState(() => _autoRotate = !_autoRotate),
-                          onToggleShowLabels: () => setState(() => _showLabels = !_showLabels),
-                          onToggleColorBySemester: () =>
-                              setState(() => _colorBySemester = !_colorBySemester),
-                          onZoomIn: () => setState(() => _zoom = (_zoom * 1.15).clamp(0.35, 4.0)),
-                          onZoomOut: () => setState(() => _zoom = (_zoom * 0.85).clamp(0.35, 4.0)),
+                          onToggleAutoRotate: () =>
+                              setState(() => _autoRotate = !_autoRotate),
+                          onToggleShowLabels: () =>
+                              setState(() => _showLabels = !_showLabels),
+                          onToggleColorBySemester: () => setState(
+                            () => _colorBySemester = !_colorBySemester,
+                          ),
+                          onZoomIn: () => setState(
+                            () => _zoom = (_zoom * 1.15).clamp(0.35, 4.0),
+                          ),
+                          onZoomOut: () => setState(
+                            () => _zoom = (_zoom * 0.85).clamp(0.35, 4.0),
+                          ),
                           onResetCamera: () {
                             setState(() {
                               _rotX = 0.25;

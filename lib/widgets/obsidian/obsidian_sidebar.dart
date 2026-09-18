@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'file_tree_view.dart';
+import '../graph/file_tree_view.dart';
 import 'obsidian_activity_bar.dart';
 import 'obsidian_bookmarks_view.dart';
 import 'obsidian_search_view.dart';
@@ -55,7 +55,10 @@ class ObsidianSidebar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: theme.dividerColor.withAlpha(70), width: 1),
+                bottom: BorderSide(
+                  color: theme.dividerColor.withAlpha(70),
+                  width: 1,
+                ),
               ),
             ),
             child: Row(
@@ -78,8 +81,15 @@ class ObsidianSidebar extends StatelessWidget {
                   message: 'Thu gọn thanh bên (Ctrl+B)',
                   child: IconButton(
                     padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                    icon: Icon(Icons.chevron_left, size: 20, color: theme.hintColor),
+                    constraints: const BoxConstraints(
+                      minWidth: 28,
+                      minHeight: 28,
+                    ),
+                    icon: Icon(
+                      Icons.chevron_left,
+                      size: 20,
+                      color: theme.hintColor,
+                    ),
                     onPressed: onCollapse,
                   ),
                 ),
@@ -108,9 +118,7 @@ class ObsidianSidebar extends StatelessWidget {
       case ActivityTab.bookmarks:
         return const ObsidianBookmarksView(key: ValueKey('tab_bookmarks'));
       case ActivityTab.graph:
-        return const Center(
-          child: Text('Đang hiển thị Graph View...'),
-        );
+        return const Center(child: Text('Đang hiển thị Graph View...'));
     }
   }
 }

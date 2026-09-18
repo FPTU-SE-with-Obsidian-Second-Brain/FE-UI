@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
 import '../providers/note_provider.dart';
-import '../widgets/ai_chat_panel.dart';
-import '../widgets/graph_view_dialog.dart';
+import '../widgets/AI Chat/ai_chat_panel.dart';
+import '../widgets/graph/graph_view_dialog.dart';
 import '../widgets/markdown_viewer.dart';
-import '../widgets/obsidian_activity_bar.dart';
-import '../widgets/obsidian_sidebar.dart';
+import '../widgets/obsidian/obsidian_activity_bar.dart';
+import '../widgets/obsidian/obsidian_sidebar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,7 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return CallbackShortcuts(
       bindings: {
-        const SingleActivator(LogicalKeyboardKey.keyB, control: true): _toggleSidebar,
+        const SingleActivator(LogicalKeyboardKey.keyB, control: true):
+            _toggleSidebar,
       },
       child: Focus(
         autofocus: true,
@@ -51,13 +52,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const Text(
                             'FPTU SE Second Brain',
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                           if (noteProvider.currentFolderPath != null)
                             Text(
                               'Vault: ${noteProvider.currentFolderPath}',
-                              style: TextStyle(fontSize: 11, color: theme.hintColor),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: theme.hintColor,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                         ],
@@ -69,18 +76,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (noteProvider.notes.isNotEmpty)
                     Container(
                       margin: const EdgeInsets.only(right: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withAlpha(80),
+                        color: colorScheme.surfaceContainerHighest.withAlpha(
+                          80,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.menu_book, size: 14, color: colorScheme.primary),
+                          Icon(
+                            Icons.menu_book,
+                            size: 14,
+                            color: colorScheme.primary,
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             '${noteProvider.notes.length} môn học/tài liệu',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
@@ -100,7 +119,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       onPressed: () => chatProvider.toggleChat(),
                       icon: const Icon(Icons.auto_awesome, size: 16),
-                      label: Text(chatProvider.isOpen ? 'Đóng AI' : '🤖 Trợ lý AI'),
+                      label: Text(
+                        chatProvider.isOpen ? 'Đóng AI' : '🤖 Trợ lý AI',
+                      ),
                     ),
                   ),
                 ],
@@ -130,7 +151,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 285,
                       child: ObsidianSidebar(
                         activeTab: _activeTab,
-                        onCollapse: () => setState(() => _isFileTreeOpen = false),
+                        onCollapse: () =>
+                            setState(() => _isFileTreeOpen = false),
                       ),
                     ),
                     VerticalDivider(
@@ -141,9 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
 
                   // 3. Màn hình đọc Markdown chính (chiếm toàn bộ không gian còn lại)
-                  const Expanded(
-                    child: MarkdownViewer(),
-                  ),
+                  const Expanded(child: MarkdownViewer()),
 
                   // 4. Khung Chat AI RAG ở cạnh phải khi được kích hoạt
                   if (chatProvider.isOpen) const AiChatPanel(),

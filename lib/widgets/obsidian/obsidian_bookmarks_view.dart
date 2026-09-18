@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/note_file.dart';
-import '../providers/note_provider.dart';
+import '../../models/note_file.dart';
+import '../../providers/note_provider.dart';
 
 class ObsidianBookmarksView extends StatefulWidget {
   const ObsidianBookmarksView({super.key});
@@ -63,7 +63,11 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
             Expanded(
               child: _tabIndex == 0
                   ? _buildCoreList(context, provider, coreNotes)
-                  : _buildCustomBookmarksList(context, provider, bookmarkedNotes),
+                  : _buildCustomBookmarksList(
+                      context,
+                      provider,
+                      bookmarkedNotes,
+                    ),
             ),
           ],
         );
@@ -86,7 +90,9 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? colorScheme.primary.withAlpha(45) : Colors.transparent,
+          color: isSelected
+              ? colorScheme.primary.withAlpha(45)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
@@ -104,7 +110,9 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
               decoration: BoxDecoration(
-                color: isSelected ? colorScheme.primary.withAlpha(70) : colorScheme.surfaceContainerHighest,
+                color: isSelected
+                    ? colorScheme.primary.withAlpha(70)
+                    : colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -122,7 +130,11 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
     );
   }
 
-  Widget _buildCoreList(BuildContext context, NoteProvider provider, List<NoteFile> list) {
+  Widget _buildCoreList(
+    BuildContext context,
+    NoteProvider provider,
+    List<NoteFile> list,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -147,7 +159,9 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
           key: ValueKey('core_${note.path}'),
           margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
-            color: isSelected ? colorScheme.primary.withAlpha(35) : Colors.transparent,
+            color: isSelected
+                ? colorScheme.primary.withAlpha(35)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Material(
@@ -157,13 +171,18 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
               borderRadius: BorderRadius.circular(6),
               onTap: () => provider.selectNote(note),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.stars_rounded,
                       size: 18,
-                      color: isSelected ? colorScheme.primary : const Color(0xFFEAB308),
+                      color: isSelected
+                          ? colorScheme.primary
+                          : const Color(0xFFEAB308),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -174,14 +193,19 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
                             note.title,
                             style: TextStyle(
                               fontSize: 13,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
                               color: isSelected ? colorScheme.primary : null,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
                             note.folderName,
-                            style: TextStyle(fontSize: 11, color: theme.hintColor),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: theme.hintColor,
+                            ),
                           ),
                         ],
                       ),
@@ -190,7 +214,9 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
                       icon: Icon(
                         isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
                         size: 16,
-                        color: isBookmarked ? const Color(0xFFA855F7) : theme.hintColor,
+                        color: isBookmarked
+                            ? const Color(0xFFA855F7)
+                            : theme.hintColor,
                       ),
                       tooltip: isBookmarked ? 'Bỏ ghim' : 'Ghim môn học',
                       onPressed: () => provider.toggleBookmark(note),
@@ -205,7 +231,11 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
     );
   }
 
-  Widget _buildCustomBookmarksList(BuildContext context, NoteProvider provider, List<NoteFile> list) {
+  Widget _buildCustomBookmarksList(
+    BuildContext context,
+    NoteProvider provider,
+    List<NoteFile> list,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -216,17 +246,28 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.bookmark_border_rounded, size: 44, color: theme.hintColor.withAlpha(120)),
+              Icon(
+                Icons.bookmark_border_rounded,
+                size: 44,
+                color: theme.hintColor.withAlpha(120),
+              ),
               const SizedBox(height: 12),
               Text(
                 'Chưa ghim môn nào',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: theme.hintColor),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: theme.hintColor,
+                ),
               ),
               const SizedBox(height: 6),
               Text(
                 'Bạn có thể ghim các môn đang học hoặc chuẩn bị thi để truy cập nhanh chóng.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 11, color: theme.hintColor.withAlpha(160)),
+                style: TextStyle(
+                  fontSize: 11,
+                  color: theme.hintColor.withAlpha(160),
+                ),
               ),
             ],
           ),
@@ -245,7 +286,9 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
           key: ValueKey('bm_${note.path}'),
           margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
-            color: isSelected ? colorScheme.primary.withAlpha(35) : Colors.transparent,
+            color: isSelected
+                ? colorScheme.primary.withAlpha(35)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Material(
@@ -255,7 +298,10 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
               borderRadius: BorderRadius.circular(6),
               onTap: () => provider.selectNote(note),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 child: Row(
                   children: [
                     const Icon(
@@ -272,14 +318,19 @@ class _ObsidianBookmarksViewState extends State<ObsidianBookmarksView> {
                             note.title,
                             style: TextStyle(
                               fontSize: 13,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
                               color: isSelected ? colorScheme.primary : null,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
                             note.folderName,
-                            style: TextStyle(fontSize: 11, color: theme.hintColor),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: theme.hintColor,
+                            ),
                           ),
                         ],
                       ),

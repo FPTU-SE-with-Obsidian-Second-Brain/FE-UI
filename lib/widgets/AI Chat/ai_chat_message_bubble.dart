@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
-import '../models/chat_message.dart';
-import '../providers/note_provider.dart';
+import '../../models/chat_message.dart';
+import '../../providers/note_provider.dart';
 
 export 'ai_chat_loading_bubble.dart';
 
@@ -11,10 +11,7 @@ export 'ai_chat_loading_bubble.dart';
 class AiChatMessageBubble extends StatelessWidget {
   final ChatMessage message;
 
-  const AiChatMessageBubble({
-    super.key,
-    required this.message,
-  });
+  const AiChatMessageBubble({super.key, required this.message});
 
   void _copyToClipboard(BuildContext context, String text, String messageType) {
     Clipboard.setData(ClipboardData(text: text));
@@ -55,7 +52,9 @@ class AiChatMessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
@@ -65,7 +64,9 @@ class AiChatMessageBubble extends StatelessWidget {
                   ? Colors.red.withAlpha(50)
                   : colorScheme.primary.withAlpha(40),
               child: Icon(
-                message.isError ? Icons.error_outline : Icons.smart_toy_outlined,
+                message.isError
+                    ? Icons.error_outline
+                    : Icons.smart_toy_outlined,
                 size: 16,
                 color: message.isError ? Colors.red : colorScheme.primary,
               ),
@@ -79,8 +80,8 @@ class AiChatMessageBubble extends StatelessWidget {
                 color: isUser
                     ? colorScheme.primary
                     : (message.isError
-                        ? Colors.red.withAlpha(25)
-                        : colorScheme.surfaceContainerHighest.withAlpha(120)),
+                          ? Colors.red.withAlpha(25)
+                          : colorScheme.surfaceContainerHighest.withAlpha(120)),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(14),
                   topRight: const Radius.circular(14),
@@ -120,7 +121,10 @@ class AiChatMessageBubble extends StatelessWidget {
                             isUser ? 'câu hỏi' : 'câu trả lời',
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 2,
+                            ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -166,7 +170,10 @@ class AiChatMessageBubble extends StatelessWidget {
                       selectable: true,
                       styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
                         p: const TextStyle(fontSize: 12.5, height: 1.5),
-                        code: const TextStyle(fontSize: 11.5, fontFamily: 'monospace'),
+                        code: const TextStyle(
+                          fontSize: 11.5,
+                          fontFamily: 'monospace',
+                        ),
                         codeblockDecoration: BoxDecoration(
                           color: colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(6),
@@ -199,8 +206,10 @@ class AiChatMessageBubble extends StatelessWidget {
                       children: message.sources.map((src) {
                         return InkWell(
                           onTap: () {
-                            final noteProvider =
-                                Provider.of<NoteProvider>(context, listen: false);
+                            final noteProvider = Provider.of<NoteProvider>(
+                              context,
+                              listen: false,
+                            );
                             final found = noteProvider.selectNoteByLink(src);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -215,7 +224,10 @@ class AiChatMessageBubble extends StatelessWidget {
                           },
                           borderRadius: BorderRadius.circular(4),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: colorScheme.primary.withAlpha(20),
                               borderRadius: BorderRadius.circular(4),
@@ -227,7 +239,11 @@ class AiChatMessageBubble extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.description, size: 11, color: colorScheme.primary),
+                                Icon(
+                                  Icons.description,
+                                  size: 11,
+                                  color: colorScheme.primary,
+                                ),
                                 const SizedBox(width: 3),
                                 Text(
                                   src,
@@ -254,4 +270,3 @@ class AiChatMessageBubble extends StatelessWidget {
     );
   }
 }
-

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/chat_provider.dart';
-import '../providers/note_provider.dart';
+import '../../providers/chat_provider.dart';
+import '../../providers/note_provider.dart';
 
 enum ActivityTab { files, search, bookmarks, graph }
 
@@ -62,7 +62,11 @@ class ObsidianActivityBar extends StatelessWidget {
                   width: 1,
                 ),
               ),
-              child: Icon(Icons.hub_outlined, color: colorScheme.primary, size: 20),
+              child: Icon(
+                Icons.hub_outlined,
+                color: colorScheme.primary,
+                size: 20,
+              ),
             ),
           ),
 
@@ -141,7 +145,9 @@ class ObsidianActivityBar extends StatelessWidget {
           // 5. Nút Trợ lý AI (RAG Chatbot)
           _buildIconButton(
             context: context,
-            icon: chatProvider.isOpen ? Icons.auto_awesome : Icons.auto_awesome_outlined,
+            icon: chatProvider.isOpen
+                ? Icons.auto_awesome
+                : Icons.auto_awesome_outlined,
             tooltip: 'Trợ lý AI RAG Chatbot',
             isActive: chatProvider.isOpen,
             accentColor: const Color(0xFFA855F7),
@@ -157,7 +163,9 @@ class ObsidianActivityBar extends StatelessWidget {
             tooltip: 'Quét lại thư mục (Reload Vault)',
             isActive: false,
             onPressed: noteProvider.currentFolderPath != null
-                ? () => noteProvider.loadFromFolder(noteProvider.currentFolderPath!)
+                ? () => noteProvider.loadFromFolder(
+                    noteProvider.currentFolderPath!,
+                  )
                 : null,
           ),
 
@@ -247,7 +255,9 @@ class ObsidianActivityBar extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: isActive ? primaryColor.withAlpha(35) : Colors.transparent,
+                color: isActive
+                    ? primaryColor.withAlpha(35)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: IconButton(
@@ -267,14 +277,21 @@ class ObsidianActivityBar extends StatelessWidget {
                 top: 2,
                 right: 4,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 1,
+                  ),
                   decoration: BoxDecoration(
                     color: primaryColor,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     badge,
-                    style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -294,7 +311,10 @@ class ObsidianActivityBar extends StatelessWidget {
           children: [
             Icon(Icons.query_stats_rounded, color: Color(0xFF9333EA)),
             SizedBox(width: 10),
-            Text('Thông số Vault & Cài đặt', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            Text(
+              'Thông số Vault & Cài đặt',
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         content: SizedBox(
@@ -303,22 +323,44 @@ class ObsidianActivityBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStatRow('Thư mục lưu trữ:', provider.currentFolderPath ?? 'Chưa chọn'),
+              _buildStatRow(
+                'Thư mục lưu trữ:',
+                provider.currentFolderPath ?? 'Chưa chọn',
+              ),
               const SizedBox(height: 8),
-              _buildStatRow('Tổng số môn học/ghi chú:', '${provider.totalNotesCount} file .md'),
+              _buildStatRow(
+                'Tổng số môn học/ghi chú:',
+                '${provider.totalNotesCount} file .md',
+              ),
               const SizedBox(height: 8),
-              _buildStatRow('Tổng liên kết hai chiều [[...]]:', '${provider.totalLinksCount} liên kết'),
+              _buildStatRow(
+                'Tổng liên kết hai chiều [[...]]:',
+                '${provider.totalLinksCount} liên kết',
+              ),
               const SizedBox(height: 8),
-              _buildStatRow('Số kỳ học / thư mục:', '${provider.totalSemestersCount} thư mục'),
+              _buildStatRow(
+                'Số kỳ học / thư mục:',
+                '${provider.totalSemestersCount} thư mục',
+              ),
               const Divider(height: 24),
               const Text(
                 'Phân công nhóm PRM392:',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFA855F7)),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFA855F7),
+                ),
               ),
               const SizedBox(height: 6),
-              const Text('• TV1: Data Engineer (Crawling môn SE & chuyển Markdown)'),
-              const Text('• TV2: Flutter UI & File Handling (Activity Bar, Split View)'),
-              const Text('• TV3: Graph Visualizer (Mạng lưới liên kết môn học)'),
+              const Text(
+                '• TV1: Data Engineer (Crawling môn SE & chuyển Markdown)',
+              ),
+              const Text(
+                '• TV2: Flutter UI & File Handling (Activity Bar, Split View)',
+              ),
+              const Text(
+                '• TV3: Graph Visualizer (Mạng lưới liên kết môn học)',
+              ),
               const Text('• TV4: AI / RAG Backend (FastAPI + ChromaDB)'),
             ],
           ),

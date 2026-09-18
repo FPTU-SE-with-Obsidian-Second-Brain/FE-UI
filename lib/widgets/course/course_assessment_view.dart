@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import '../models/course_metadata.dart';
+import '../../models/course_metadata.dart';
 
 /// Widget hiển thị bảng thành phần điểm và tỷ trọng (%) của môn học
 class CourseAssessmentView extends StatelessWidget {
   final List<AssessmentComponent> assessments;
 
-  const CourseAssessmentView({
-    super.key,
-    required this.assessments,
-  });
+  const CourseAssessmentView({super.key, required this.assessments});
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +141,10 @@ class CourseAssessmentView extends StatelessWidget {
                   const SizedBox(width: 6),
                   // Badge điều kiện pass môn (VD: > 0 hoặc >= 4.0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: isFinal
                           ? const Color(0xFFEF4444).withAlpha(25)
@@ -172,7 +172,10 @@ class CourseAssessmentView extends StatelessWidget {
                   // Badge tỷ trọng %
                   Container(
                     constraints: const BoxConstraints(minWidth: 46),
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: comp.color.withAlpha(35),
                       borderRadius: BorderRadius.circular(6),

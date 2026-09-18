@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/chat_provider.dart';
+import '../../providers/chat_provider.dart';
 import 'ai_chat_input_bar.dart';
 import 'ai_chat_message_bubble.dart';
 
@@ -85,14 +85,18 @@ class _AiChatPanelState extends State<AiChatPanel> {
                 onExit: (_) => setState(() => _isHoveringResizeHandle = false),
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
-                  onHorizontalDragStart: (_) => setState(() => _isDragging = true),
+                  onHorizontalDragStart: (_) =>
+                      setState(() => _isDragging = true),
                   onHorizontalDragUpdate: (details) {
                     setState(() {
-                      _chatWidth = (_chatWidth - details.delta.dx)
-                          .clamp(320.0, maxAllowedWidth);
+                      _chatWidth = (_chatWidth - details.delta.dx).clamp(
+                        320.0,
+                        maxAllowedWidth,
+                      );
                     });
                   },
-                  onHorizontalDragEnd: (_) => setState(() => _isDragging = false),
+                  onHorizontalDragEnd: (_) =>
+                      setState(() => _isDragging = false),
                   onDoubleTap: () {
                     setState(() {
                       _chatWidth = _chatWidth > 550 ? 420.0 : 680.0;
@@ -125,11 +129,19 @@ class _AiChatPanelState extends State<AiChatPanel> {
                   children: [
                     // Header khung Chat
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withAlpha(50),
+                        color: colorScheme.surfaceContainerHighest.withAlpha(
+                          50,
+                        ),
                         border: Border(
-                          bottom: BorderSide(color: theme.dividerColor, width: 1),
+                          bottom: BorderSide(
+                            color: theme.dividerColor,
+                            width: 1,
+                          ),
                         ),
                       ),
                       child: Row(
@@ -140,7 +152,11 @@ class _AiChatPanelState extends State<AiChatPanel> {
                               color: colorScheme.primary.withAlpha(35),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(Icons.auto_awesome, color: colorScheme.primary, size: 18),
+                            child: Icon(
+                              Icons.auto_awesome,
+                              color: colorScheme.primary,
+                              size: 18,
+                            ),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
@@ -149,11 +165,17 @@ class _AiChatPanelState extends State<AiChatPanel> {
                               children: [
                                 const Text(
                                   'Trợ lý AI (FPTU RAG)',
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 Text(
                                   'Backend: http://127.0.0.1:8000',
-                                  style: TextStyle(fontSize: 11, color: theme.hintColor),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: theme.hintColor,
+                                  ),
                                 ),
                               ],
                             ),
@@ -195,7 +217,8 @@ class _AiChatPanelState extends State<AiChatPanel> {
                       child: ListView.builder(
                         controller: _scrollController,
                         padding: const EdgeInsets.all(12),
-                        itemCount: chatProvider.messages.length +
+                        itemCount:
+                            chatProvider.messages.length +
                             (chatProvider.isLoading ? 1 : 0),
                         itemBuilder: (context, index) {
                           if (index == chatProvider.messages.length) {

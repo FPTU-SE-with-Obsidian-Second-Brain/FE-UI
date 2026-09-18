@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/course_metadata.dart';
-import '../models/graph_node_3d.dart';
-import '../models/note_file.dart';
-import 'course_assessment_view.dart';
-import 'course_info_header.dart';
-import 'course_prerequisites_view.dart';
+import '../../models/course_metadata.dart';
+import '../../models/graph_node_3d.dart';
+import '../../models/note_file.dart';
+import '../course/course_assessment_view.dart';
+import '../course/course_info_header.dart';
+import '../course/course_prerequisites_view.dart';
 
 /// Widget thanh bên cạnh (Side Panel) hiển thị thông tin chi tiết môn học trên đồ thị 3D
 class GraphCourseSidePanel extends StatefulWidget {
@@ -130,7 +130,9 @@ class _GraphCourseSidePanelState extends State<GraphCourseSidePanel> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withAlpha(35),
+                        color: colorScheme.surfaceContainerHighest.withAlpha(
+                          35,
+                        ),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: theme.dividerColor.withAlpha(60),
@@ -140,8 +142,8 @@ class _GraphCourseSidePanelState extends State<GraphCourseSidePanel> {
                         _isDescExpanded
                             ? meta.description
                             : (meta.description.length > 140
-                                ? '${meta.description.substring(0, 140)}...'
-                                : meta.description),
+                                  ? '${meta.description.substring(0, 140)}...'
+                                  : meta.description),
                         style: const TextStyle(
                           fontSize: 12,
                           height: 1.5,

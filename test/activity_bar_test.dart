@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obsidian_app/providers/chat_provider.dart';
 import 'package:obsidian_app/providers/note_provider.dart';
-import 'package:obsidian_app/widgets/obsidian_activity_bar.dart';
-import 'package:obsidian_app/widgets/obsidian_sidebar.dart';
+import 'package:obsidian_app/widgets/obsidian/obsidian_activity_bar.dart';
+import 'package:obsidian_app/widgets/obsidian/obsidian_sidebar.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -14,16 +14,20 @@ void main() {
   }) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<NoteProvider>(create: (_) => noteProvider ?? NoteProvider()),
-        ChangeNotifierProvider<ChatProvider>(create: (_) => chatProvider ?? ChatProvider()),
+        ChangeNotifierProvider<NoteProvider>(
+          create: (_) => noteProvider ?? NoteProvider(),
+        ),
+        ChangeNotifierProvider<ChatProvider>(
+          create: (_) => chatProvider ?? ChatProvider(),
+        ),
       ],
-      child: MaterialApp(
-        home: Scaffold(body: child),
-      ),
+      child: MaterialApp(home: Scaffold(body: child)),
     );
   }
 
-  testWidgets('ObsidianActivityBar renders icons and triggers tab selection', (WidgetTester tester) async {
+  testWidgets('ObsidianActivityBar renders icons and triggers tab selection', (
+    WidgetTester tester,
+  ) async {
     ActivityTab selectedTab = ActivityTab.files;
     bool isFileTreeOpen = true;
 
@@ -35,7 +39,8 @@ void main() {
               isFileTreeOpen: isFileTreeOpen,
               activeTab: selectedTab,
               onTabSelected: (tab) => setState(() => selectedTab = tab),
-              onToggleFileTree: () => setState(() => isFileTreeOpen = !isFileTreeOpen),
+              onToggleFileTree: () =>
+                  setState(() => isFileTreeOpen = !isFileTreeOpen),
               onOpenGraphView: () {},
             );
           },
@@ -52,10 +57,19 @@ void main() {
     expect(find.byIcon(Icons.folder), findsOneWidget); // Files (active)
     expect(find.byIcon(Icons.search_rounded), findsOneWidget); // Search
     expect(find.byIcon(Icons.bookmark_outline), findsOneWidget); // Bookmarks
-    expect(find.byIcon(Icons.bubble_chart_outlined), findsOneWidget); // Graph View
-    expect(find.byIcon(Icons.auto_awesome_outlined), findsOneWidget); // AI Chatbot
+    expect(
+      find.byIcon(Icons.bubble_chart_outlined),
+      findsOneWidget,
+    ); // Graph View
+    expect(
+      find.byIcon(Icons.auto_awesome_outlined),
+      findsOneWidget,
+    ); // AI Chatbot
     expect(find.byIcon(Icons.refresh_rounded), findsOneWidget); // Reload
-    expect(find.byIcon(Icons.folder_open_outlined), findsOneWidget); // Open Folder
+    expect(
+      find.byIcon(Icons.folder_open_outlined),
+      findsOneWidget,
+    ); // Open Folder
     expect(find.byIcon(Icons.settings_outlined), findsOneWidget); // Settings
 
     // Tap Search tab
@@ -65,7 +79,9 @@ void main() {
     expect(selectedTab, ActivityTab.search);
   });
 
-  testWidgets('ObsidianSidebar switches title and body per active tab', (WidgetTester tester) async {
+  testWidgets('ObsidianSidebar switches title and body per active tab', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       buildTestWidget(
         child: SizedBox(

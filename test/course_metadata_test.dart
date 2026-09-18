@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obsidian_app/models/note_file.dart';
-import 'package:obsidian_app/widgets/graph_view_dialog.dart';
+import 'package:obsidian_app/widgets/graph/graph_view_dialog.dart';
 
 void main() {
   group('CourseMetadata Tests', () {
@@ -32,48 +32,64 @@ tags: [Object-Oriented Programming, PRO192]
 - **Final Exam:** 30.0% (Multiple choices)
 ''';
 
-    test('CourseMetadata extracts full description and all 5 assessments without truncation', () {
-      final note = NoteFile(
-        path: 'dummy/PRO192.md',
-        fileName: 'PRO192.md',
-        title: 'PRO192',
-        folderName: 'Kỳ 2',
-        rawContent: samplePro192Content,
-        links: ['Pass PRF192'],
-        lastModified: DateTime.now(),
-      );
+    test(
+      'CourseMetadata extracts full description and all 5 assessments without truncation',
+      () {
+        final note = NoteFile(
+          path: 'dummy/PRO192.md',
+          fileName: 'PRO192.md',
+          title: 'PRO192',
+          folderName: 'Kỳ 2',
+          rawContent: samplePro192Content,
+          links: ['Pass PRF192'],
+          lastModified: DateTime.now(),
+        );
 
-      final meta = CourseMetadata.fromNote(note);
+        final meta = CourseMetadata.fromNote(note);
 
-      expect(meta.code, 'PRO192');
-      expect(meta.credits, '3 tín chỉ');
-      
-      // Description must not be truncated to 200 chars
-      expect(meta.description.length, greaterThan(250));
-      expect(meta.description.contains('This subject introduces'), isTrue);
-      expect(meta.description.contains('Compose technical documentation'), isTrue);
-      expect(meta.description.contains('Trace the execution'), isTrue);
+        expect(meta.code, 'PRO192');
+        expect(meta.credits, '3 tín chỉ');
 
-      // Assessments must have 5 components with correct percentages
-      expect(meta.assessments.length, 5);
-      
-      final as = meta.assessments.firstWhere((a) => a.category.contains('Assignment'));
-      expect(as.weightPercent, 20.0);
-      expect(as.criteria, contains('> 0'));
+        // Description must not be truncated to 200 chars
+        expect(meta.description.length, greaterThan(250));
+        expect(meta.description.contains('This subject introduces'), isTrue);
+        expect(
+          meta.description.contains('Compose technical documentation'),
+          isTrue,
+        );
+        expect(meta.description.contains('Trace the execution'), isTrue);
 
-      final lab = meta.assessments.firstWhere((a) => a.category.contains('Lab'));
-      expect(lab.weightPercent, 10.0);
-      expect(lab.criteria, contains('> 0'));
+        // Assessments must have 5 components with correct percentages
+        expect(meta.assessments.length, 5);
 
-      final pe = meta.assessments.firstWhere((a) => a.category.contains('Practical'));
-      expect(pe.weightPercent, 30.0);
+        final as = meta.assessments.firstWhere(
+          (a) => a.category.contains('Assignment'),
+        );
+        expect(as.weightPercent, 20.0);
+        expect(as.criteria, contains('> 0'));
 
-      final pt = meta.assessments.firstWhere((a) => a.category.contains('Progress'));
-      expect(pt.weightPercent, 10.0);
+        final lab = meta.assessments.firstWhere(
+          (a) => a.category.contains('Lab'),
+        );
+        expect(lab.weightPercent, 10.0);
+        expect(lab.criteria, contains('> 0'));
 
-      final fe = meta.assessments.firstWhere((a) => a.category.contains('Final'));
-      expect(fe.weightPercent, 30.0);
-      expect(fe.criteria, contains('4.0'));
-    });
+        final pe = meta.assessments.firstWhere(
+          (a) => a.category.contains('Practical'),
+        );
+        expect(pe.weightPercent, 30.0);
+
+        final pt = meta.assessments.firstWhere(
+          (a) => a.category.contains('Progress'),
+        );
+        expect(pt.weightPercent, 10.0);
+
+        final fe = meta.assessments.firstWhere(
+          (a) => a.category.contains('Final'),
+        );
+        expect(fe.weightPercent, 30.0);
+        expect(fe.criteria, contains('4.0'));
+      },
+    );
   });
 }

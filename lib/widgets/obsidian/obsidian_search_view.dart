@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/note_provider.dart';
+import '../../providers/note_provider.dart';
 
 class ObsidianSearchView extends StatelessWidget {
   const ObsidianSearchView({super.key});
@@ -41,7 +41,10 @@ class ObsidianSearchView extends StatelessWidget {
                   isDense: true,
                   filled: true,
                   fillColor: colorScheme.surfaceContainerHighest.withAlpha(80),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -68,14 +71,16 @@ class ObsidianSearchView extends StatelessWidget {
                       context,
                       label: 'Mã / Tên môn',
                       isSelected: provider.searchMode == SearchMode.titleOnly,
-                      onSelected: () => provider.setSearchMode(SearchMode.titleOnly),
+                      onSelected: () =>
+                          provider.setSearchMode(SearchMode.titleOnly),
                     ),
                     const SizedBox(width: 6),
                     _buildModeChip(
                       context,
                       label: 'Trong nội dung',
                       isSelected: provider.searchMode == SearchMode.contentOnly,
-                      onSelected: () => provider.setSearchMode(SearchMode.contentOnly),
+                      onSelected: () =>
+                          provider.setSearchMode(SearchMode.contentOnly),
                     ),
                   ],
                 ),
@@ -87,7 +92,10 @@ class ObsidianSearchView extends StatelessWidget {
             // Thông báo số lượng kết quả tìm thấy
             if (hasQuery)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14.0,
+                  vertical: 4.0,
+                ),
                 child: Row(
                   children: [
                     Text(
@@ -113,110 +121,149 @@ class ObsidianSearchView extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.manage_search_outlined, size: 48, color: theme.hintColor.withAlpha(120)),
+                            Icon(
+                              Icons.manage_search_outlined,
+                              size: 48,
+                              color: theme.hintColor.withAlpha(120),
+                            ),
                             const SizedBox(height: 12),
                             Text(
                               'Tìm kiếm nhanh',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: theme.hintColor),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: theme.hintColor,
+                              ),
                             ),
                             const SizedBox(height: 6),
                             Text(
                               'Gõ mã môn (ví dụ: PRM, PRF, CSD) hoặc từ khóa bài học để tra cứu toàn bộ kho tri thức.',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 12, color: theme.hintColor.withAlpha(150)),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: theme.hintColor.withAlpha(150),
+                              ),
                             ),
                           ],
                         ),
                       ),
                     )
                   : results.isEmpty
-                      ? Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search_off_rounded,
+                              size: 40,
+                              color: theme.hintColor,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Không tìm thấy kết quả',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: theme.hintColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      itemCount: results.length,
+                      separatorBuilder: (context, index) =>
+                          const Divider(height: 1, indent: 12, endIndent: 12),
+                      itemBuilder: (context, index) {
+                        final item = results[index];
+                        final note = item.note;
+                        final isSelected =
+                            note.path == provider.selectedNote?.path;
+
+                        return InkWell(
+                          onTap: () => provider.selectNote(note),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            color: isSelected
+                                ? colorScheme.primary.withAlpha(35)
+                                : Colors.transparent,
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(Icons.search_off_rounded, size: 40, color: theme.hintColor),
-                                const SizedBox(height: 10),
-                                Text(
-                                  'Không tìm thấy kết quả',
-                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: theme.hintColor),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.description_outlined,
+                                      size: 16,
+                                      color: isSelected
+                                          ? colorScheme.primary
+                                          : colorScheme.onSurfaceVariant,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        note.title,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: isSelected
+                                              ? FontWeight.bold
+                                              : FontWeight.w600,
+                                          color: isSelected
+                                              ? colorScheme.primary
+                                              : null,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            colorScheme.surfaceContainerHighest,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        note.folderName,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                                if (item.matchedSnippet != null) ...[
+                                  const SizedBox(height: 4),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 24.0),
+                                    child: Text(
+                                      item.matchedSnippet!,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: theme.hintColor,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
-                        )
-                      : ListView.separated(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          itemCount: results.length,
-                          separatorBuilder: (context, index) => const Divider(height: 1, indent: 12, endIndent: 12),
-                          itemBuilder: (context, index) {
-                            final item = results[index];
-                            final note = item.note;
-                            final isSelected = note.path == provider.selectedNote?.path;
-
-                            return InkWell(
-                              onTap: () => provider.selectNote(note),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                color: isSelected ? colorScheme.primary.withAlpha(35) : Colors.transparent,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.description_outlined,
-                                          size: 16,
-                                          color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            note.title,
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                                              color: isSelected ? colorScheme.primary : null,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: colorScheme.surfaceContainerHighest,
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: Text(
-                                            note.folderName,
-                                            style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    if (item.matchedSnippet != null) ...[
-                                      const SizedBox(height: 4),
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 24.0),
-                                        child: Text(
-                                          item.matchedSnippet!,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: theme.hintColor,
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                        );
+                      },
+                    ),
             ),
           ],
         );
@@ -240,7 +287,9 @@ class ObsidianSearchView extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? colorScheme.primary.withAlpha(45) : colorScheme.surfaceContainerHighest.withAlpha(50),
+          color: isSelected
+              ? colorScheme.primary.withAlpha(45)
+              : colorScheme.surfaceContainerHighest.withAlpha(50),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? colorScheme.primary : Colors.transparent,
