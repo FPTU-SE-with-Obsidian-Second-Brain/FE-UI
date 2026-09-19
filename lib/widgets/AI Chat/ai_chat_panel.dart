@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/chat_provider.dart';
+import '../../providers/note_provider.dart';
 import 'ai_chat_input_bar.dart';
 import 'ai_chat_message_bubble.dart';
+import 'study_plan_dialog.dart';
 
 /// Khung điều khiển trò chuyện Trợ lý AI (FPTU RAG Chatbot)
 class AiChatPanel extends StatefulWidget {
@@ -22,10 +24,16 @@ class _AiChatPanelState extends State<AiChatPanel> {
   bool _isDragging = false;
   bool _isHoveringResizeHandle = false;
 
-  final List<String> _suggestions = [
+  static const List<String> _defaultSuggestions = [
     'Môn CSD201 học những gì?',
     'Điều kiện tiên quyết của môn SWP391?',
     'Môn PRF192 có bao nhiêu buổi học?',
+  ];
+
+  static const List<String> _scopedSuggestions = [
+    'Tóm tắt môn này',
+    '10 flashcard ôn tập',
+    'Môn tiên quyết là gì?',
   ];
 
   @override
@@ -57,6 +65,17 @@ class _AiChatPanelState extends State<AiChatPanel> {
     _focusNode.requestFocus();
   }
 
+  Future<void> _openStudyPlanDialog(ChatProvider chatProvider) async {
+    final result = await showStudyPlanDialog(context);
+    if (result == null || !mounted) return;
+    await chatProvider.sendStudyPlan(
+      currentSemester: result.semester,
+      goal: result.goal,
+      comboTrack: result.comboTrack,
+    );
+    _scrollToBottom();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -64,9 +83,22 @@ class _AiChatPanelState extends State<AiChatPanel> {
     final screenWidth = MediaQuery.of(context).size.width;
     final maxAllowedWidth = (screenWidth * 0.85).clamp(450.0, 1100.0);
 
-    return Consumer<ChatProvider>(
-      builder: (context, chatProvider, _) {
+    return Consumer2<ChatProvider, NoteProvider>(
+      builder: (context, chatProvider, noteProvider, _) {
+        // Đồng bộ note đang mở sau frame (tránh side-effect trong build)
+        final selected = noteProvider.selectedNote;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          chatProvider.setCurrentNote(selected);
+        });
+
         _scrollToBottom();
+
+        final subjectId = chatProvider.resolveCurrentSubjectId();
+        final hasNote = noteProvider.selectedNote != null;
+        final suggestions = chatProvider.scopeToCurrentSubject
+            ? _scopedSuggestions
+            : _defaultSuggestions;
 
         return Container(
           width: _chatWidth.clamp(320.0, maxAllowedWidth),
@@ -230,14 +262,66 @@ class _AiChatPanelState extends State<AiChatPanel> {
                       ),
                     ),
 
-                    // Thanh nhập câu hỏi & gợi ý nhanh (Component tách rời)
+                    // Thanh nhập + toggle scope + @ autocomplete
                     AiChatInputBar(
                       controller: _controller,
                       focusNode: _focusNode,
                       isLoading: chatProvider.isLoading,
                       onSend: (text) => _handleSend(chatProvider, text),
-                      suggestions: _suggestions,
-                      showSuggestions: chatProvider.messages.length <= 2,
+                      suggestions: suggestions,
+                      showSuggestions: chatProvider.messages.length <= 2 ||
+                          chatProvider.scopeToCurrentSubject,
+                      notes: noteProvider.notes,
+                      onStudyPlanTap: () =>
+                          _openStudyPlanDialog(chatProvider),
+                      leadingChips: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            FilterChip(
+                              selected: chatProvider.scopeToCurrentSubject,
+                              label: Text(
+                                hasNote && subjectId != null
+                                    ? 'Chỉ hỏi trong môn này ($subjectId)'
+                                    : 'Chỉ hỏi trong môn này',
+                                style: const TextStyle(fontSize: 11.5),
+                              ),
+                              avatar: Icon(
+                                Icons.filter_alt_outlined,
+                                size: 16,
+                                color: chatProvider.scopeToCurrentSubject
+                                    ? colorScheme.primary
+                                    : theme.hintColor,
+                              ),
+                              onSelected: hasNote
+                                  ? (v) =>
+                                      chatProvider.setScopeToCurrentSubject(v)
+                                  : null,
+                            ),
+                            if (chatProvider.scopeToCurrentSubject &&
+                                hasNote &&
+                                subjectId != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Chip(
+                                    visualDensity: VisualDensity.compact,
+                                    label: Text(
+                                      '$subjectId · ${noteProvider.selectedNote!.folderName}',
+                                      style: const TextStyle(fontSize: 11),
+                                    ),
+                                    avatar: const Icon(
+                                      Icons.description_outlined,
+                                      size: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),

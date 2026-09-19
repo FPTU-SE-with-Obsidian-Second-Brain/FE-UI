@@ -254,7 +254,34 @@ class NoteProvider extends ChangeNotifier {
       selectNote(target);
       return true;
     }
-    return false;
+    // Fallback: đường dẫn tương đối kiểu "Kỳ 8/PRM393.md"
+    return selectNoteBySourcePath(link);
+  }
+
+  /// Mở note theo đường dẫn tương đối KB / tên file (additive helper cho RAG sources).
+  bool selectNoteBySourcePath(String sourcePath) {
+    final normalized = sourcePath.replaceAll('\\', '/').trim();
+    final baseName = normalized.contains('/')
+        ? normalized.split('/').last
+        : normalized;
+    final byName = getNoteByFileName(baseName);
+    if (byName != null) {
+      selectNote(byName);
+      return true;
+    }
+    try {
+      final match = notes.firstWhere((n) {
+        final pathNorm = n.path.replaceAll('\\', '/');
+        return pathNorm.endsWith(normalized) ||
+            pathNorm.endsWith('/$baseName') ||
+            (n.folderName.isNotEmpty &&
+                '${n.folderName}/${n.fileName}' == normalized);
+      });
+      selectNote(match);
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   /// Mở hộp thoại hệ điều hành để người dùng chọn thư mục Knowledge Base

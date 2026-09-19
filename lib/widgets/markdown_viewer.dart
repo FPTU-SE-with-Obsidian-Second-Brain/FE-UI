@@ -4,6 +4,8 @@ import 'package:markdown/markdown.dart' as md;
 import 'package:provider/provider.dart';
 import '../providers/note_provider.dart';
 import '../utils/markdown_table_converter.dart';
+import '../services/course_pdf_exporter.dart';
+import 'markdown_selection_toolbar.dart';
 
 /// Cú pháp nội dòng để chuyển thẻ <br> thành ngắt dòng thực sự trong Markdown
 class HtmlBrSyntax extends md.InlineSyntax {
@@ -81,6 +83,22 @@ class MarkdownViewer extends StatelessWidget {
                         note.fileName,
                         style: TextStyle(fontSize: 12, color: theme.hintColor),
                       ),
+                      const Spacer(),
+                      Tooltip(
+                        message: 'Xuất đề cương PDF đẹp',
+                        child: FilledButton.tonalIcon(
+                          onPressed: () => exportCoursePdf(context, note),
+                          icon: const Icon(Icons.picture_as_pdf_outlined, size: 16),
+                          label: const Text('Xuất PDF', style: TextStyle(fontSize: 12)),
+                          style: FilledButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -130,49 +148,54 @@ class MarkdownViewer extends StatelessWidget {
               ),
             ),
 
-            // Khu vực hiển thị Markdown đã render
+            // Khu vực hiển thị Markdown đã render (+ quick actions khi bôi đen)
             Expanded(
-              child: Markdown(
-                data: MarkdownTableConverter.cleanAllHtml(note.rawContent),
-                selectable: true,
-                inlineSyntaxes: [HtmlBrSyntax()],
-                onTapLink: (text, href, title) {
-                  if (href != null) {
-                    // Nếu là link dạng môn học
-                    final success = provider.selectNoteByLink(href);
-                    if (!success) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Liên kết: $href')),
-                      );
+              child: MarkdownSelectionToolbar(
+                note: note,
+                child: Markdown(
+                  data: MarkdownTableConverter.cleanAllHtml(note.rawContent),
+                  // false: SelectionArea (Quick Actions) làm chủ selection.
+                  // true sẽ tạo SelectableText lồng nhau → onSelectionChanged không chạy.
+                  selectable: false,
+                  inlineSyntaxes: [HtmlBrSyntax()],
+                  onTapLink: (text, href, title) {
+                    if (href != null) {
+                      // Nếu là link dạng môn học
+                      final success = provider.selectNoteByLink(href);
+                      if (!success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Liên kết: $href')),
+                        );
+                      }
                     }
-                  }
-                },
-                styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
-                  h1: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
+                  },
+                  styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+                    h1: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                    h2: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    h3: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                    p: const TextStyle(fontSize: 13.5, height: 1.6),
+                    code: TextStyle(
+                      backgroundColor: colorScheme.surfaceContainerHighest.withAlpha(120),
+                      fontFamily: 'monospace',
+                      fontSize: 12.5,
+                    ),
+                    codeblockDecoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest.withAlpha(90),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: theme.dividerColor.withAlpha(80)),
+                    ),
+                    tableBorder: TableBorder.all(
+                      color: theme.dividerColor.withAlpha(100),
+                      width: 0.8,
+                    ),
+                    tableHead: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5),
+                    tableBody: const TextStyle(fontSize: 12),
+                    tableCellsPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   ),
-                  h2: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  h3: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                  p: const TextStyle(fontSize: 13.5, height: 1.6),
-                  code: TextStyle(
-                    backgroundColor: colorScheme.surfaceContainerHighest.withAlpha(120),
-                    fontFamily: 'monospace',
-                    fontSize: 12.5,
-                  ),
-                  codeblockDecoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withAlpha(90),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: theme.dividerColor.withAlpha(80)),
-                  ),
-                  tableBorder: TableBorder.all(
-                    color: theme.dividerColor.withAlpha(100),
-                    width: 0.8,
-                  ),
-                  tableHead: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5),
-                  tableBody: const TextStyle(fontSize: 12),
-                  tableCellsPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 ),
               ),
             ),

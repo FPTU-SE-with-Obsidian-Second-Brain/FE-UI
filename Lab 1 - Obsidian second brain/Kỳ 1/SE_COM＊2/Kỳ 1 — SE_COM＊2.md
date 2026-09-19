@@ -1,12 +1,12 @@
 ---
-id: SE_COM*2
+id: "Kỳ1__SE_COM*2"
 type: subject_slot
-tags: ["SE_COM*2", combo_slot]
+tags: ["SE_COM*2", combo_slot, Kỳ1]
 slot: "SE_COM*2"
 semester: 1
 ---
 
-# SE_COM*2
+# Kỳ 1 — SE_COM*2
 
 Slot combo curriculum — kỳ 1. Mỗi chuyên ngành hẹp là một thư mục con.
 

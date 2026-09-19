@@ -4,6 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import '../../models/chat_message.dart';
 import '../../providers/note_provider.dart';
+import 'study_plan_timeline.dart';
 
 export 'ai_chat_loading_bubble.dart';
 
@@ -180,6 +181,10 @@ class AiChatMessageBubble extends StatelessWidget {
                         ),
                       ),
                     ),
+
+                  // Timeline lộ trình học tập (nếu có)
+                  if (!isUser && message.studyPlan != null)
+                    StudyPlanTimeline(plan: message.studyPlan!),
 
                   // Nguồn trích dẫn (sources)
                   if (!isUser && message.sources.isNotEmpty) ...[

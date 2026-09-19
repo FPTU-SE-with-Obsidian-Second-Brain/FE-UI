@@ -1,12 +1,12 @@
 ---
-id: SE_COM*4_ELE
+id: "Kỳ8__SE_COM*4_ELE"
 type: subject_slot
-tags: ["SE_COM*4_ELE", combo_slot]
+tags: ["SE_COM*4_ELE", combo_slot, Kỳ8]
 slot: "SE_COM*4_ELE"
 semester: 8
 ---
 
-# SE_COM*4_ELE
+# Kỳ 8 — SE_COM*4_ELE
 
 Slot combo curriculum — kỳ 8. Mỗi chuyên ngành hẹp là một thư mục con.
 
