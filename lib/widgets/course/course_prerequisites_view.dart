@@ -58,10 +58,10 @@ class CoursePrerequisitesView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.link, size: 12, color: colorScheme.secondary),
+                    Icon(Icons.link_rounded, size: 12, color: colorScheme.secondary),
                     const SizedBox(width: 4),
                     Text(
-                      '[[$link]]',
+                      link.replaceAll(RegExp(r'[\[\]]'), '').trim(),
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,

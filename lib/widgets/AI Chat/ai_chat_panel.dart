@@ -274,57 +274,98 @@ class _AiChatPanelState extends State<AiChatPanel> {
                       notes: noteProvider.notes,
                       onStudyPlanTap: () =>
                           _openStudyPlanDialog(chatProvider),
-                      leadingChips: Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            FilterChip(
-                              selected: chatProvider.scopeToCurrentSubject,
-                              label: Text(
-                                hasNote && subjectId != null
-                                    ? 'Chỉ hỏi trong môn này ($subjectId)'
-                                    : 'Chỉ hỏi trong môn này',
-                                style: const TextStyle(fontSize: 11.5),
-                              ),
-                              avatar: Icon(
-                                Icons.filter_alt_outlined,
-                                size: 16,
-                                color: chatProvider.scopeToCurrentSubject
-                                    ? colorScheme.primary
-                                    : theme.hintColor,
-                              ),
-                              onSelected: hasNote
-                                  ? (v) =>
-                                      chatProvider.setScopeToCurrentSubject(v)
-                                  : null,
-                            ),
-                            if (chatProvider.scopeToCurrentSubject &&
-                                hasNote &&
-                                subjectId != null)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Chip(
-                                    visualDensity: VisualDensity.compact,
-                                    label: Text(
-                                      '$subjectId · ${noteProvider.selectedNote!.folderName}',
-                                      style: const TextStyle(fontSize: 11),
-                                    ),
-                                    avatar: const Icon(
-                                      Icons.description_outlined,
-                                      size: 14,
+                      isScopeActive: chatProvider.scopeToCurrentSubject,
+                      currentSubjectId: subjectId,
+                      onToggleScope: hasNote
+                          ? () => chatProvider.setScopeToCurrentSubject(
+                              !chatProvider.scopeToCurrentSubject,
+                            )
+                          : null,
+                      leadingChips: hasNote && subjectId != null
+                          ? Padding(
+                              padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                FilterChip(
+                                  visualDensity: VisualDensity.compact,
+                                  selected: chatProvider.scopeToCurrentSubject,
+                                  showCheckmark: true,
+                                  checkmarkColor: Colors.white,
+                                  selectedColor: colorScheme.primary.withAlpha(45),
+                                  backgroundColor: colorScheme.surfaceContainerHighest.withAlpha(80),
+                                  side: BorderSide(
+                                    color: chatProvider.scopeToCurrentSubject
+                                        ? colorScheme.primary
+                                        : theme.dividerColor.withAlpha(160),
+                                    width: 1.0,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  label: Text(
+                                    'Chỉ hỏi trong môn này ($subjectId)',
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: chatProvider.scopeToCurrentSubject
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                      color: chatProvider.scopeToCurrentSubject
+                                          ? Colors.white
+                                          : colorScheme.onSurface,
                                     ),
                                   ),
+                                  avatar: Icon(
+                                    Icons.filter_alt_outlined,
+                                    size: 14,
+                                    color: chatProvider.scopeToCurrentSubject
+                                        ? colorScheme.primary
+                                        : theme.hintColor,
+                                  ),
+                                  onSelected: hasNote
+                                      ? (v) =>
+                                          chatProvider.setScopeToCurrentSubject(v)
+                                      : null,
                                 ),
-                              ),
-                          ],
+                                if (chatProvider.scopeToCurrentSubject) ...[
+                                  const SizedBox(width: 6),
+                                  Chip(
+                                    visualDensity: VisualDensity.compact,
+                                    backgroundColor: colorScheme.primary.withAlpha(25),
+                                    side: BorderSide(
+                                      color: colorScheme.primary.withAlpha(80),
+                                      width: 0.9,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    label: Text(
+                                      '$subjectId · ${noteProvider.selectedNote!.folderName}',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: colorScheme.secondary,
+                                      ),
+                                    ),
+                                    avatar: Icon(
+                                      Icons.description_outlined,
+                                      size: 13,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
+                      )
+                    : null,
+                  ),
+                ],
+              ),
               ),
             ],
           ),

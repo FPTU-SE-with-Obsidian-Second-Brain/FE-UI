@@ -160,25 +160,12 @@ class ObsidianActivityBar extends StatelessWidget {
           _buildIconButton(
             context: context,
             icon: Icons.refresh_rounded,
-            tooltip: 'Quét lại thư mục (Reload Vault)',
+            tooltip: 'Quét lại thư mục dữ liệu chuẩn',
             isActive: false,
-            onPressed: noteProvider.currentFolderPath != null
-                ? () => noteProvider.loadFromFolder(
-                    noteProvider.currentFolderPath!,
-                  )
-                : null,
+            onPressed: () => noteProvider.init(),
           ),
 
-          // 7. Nút Đổi thư mục (Open Vault Folder)
-          _buildIconButton(
-            context: context,
-            icon: Icons.folder_open_outlined,
-            tooltip: 'Đổi thư mục Knowledge Base',
-            isActive: false,
-            onPressed: () => noteProvider.pickFolder(),
-          ),
-
-          // 8. Cài đặt & Thống kê Vault
+          // 7. Cài đặt & Thống kê Vault
           _buildIconButton(
             context: context,
             icon: Icons.settings_outlined,
@@ -334,7 +321,7 @@ class ObsidianActivityBar extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               _buildStatRow(
-                'Tổng liên kết hai chiều [[...]]:',
+                'Tổng liên kết môn học:',
                 '${provider.totalLinksCount} liên kết',
               ),
               const SizedBox(height: 8),
@@ -342,26 +329,6 @@ class ObsidianActivityBar extends StatelessWidget {
                 'Số kỳ học / thư mục:',
                 '${provider.totalSemestersCount} thư mục',
               ),
-              const Divider(height: 24),
-              const Text(
-                'Phân công nhóm PRM392:',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFA855F7),
-                ),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                '• TV1: Data Engineer (Crawling môn SE & chuyển Markdown)',
-              ),
-              const Text(
-                '• TV2: Flutter UI & File Handling (Activity Bar, Split View)',
-              ),
-              const Text(
-                '• TV3: Graph Visualizer (Mạng lưới liên kết môn học)',
-              ),
-              const Text('• TV4: AI / RAG Backend (FastAPI + ChromaDB)'),
             ],
           ),
         ),

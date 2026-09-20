@@ -84,6 +84,7 @@ class NoteProvider extends ChangeNotifier {
         return note.title.toLowerCase().contains(query) ||
             note.fileName.toLowerCase().contains(query) ||
             note.folderName.toLowerCase().contains(query) ||
+            (note.comboTrack?.toLowerCase().contains(query) ?? false) ||
             note.rawContent.toLowerCase().contains(query);
       }
     }).toList();
@@ -98,7 +99,8 @@ class NoteProvider extends ChangeNotifier {
     for (final note in notes) {
       final inTitle = note.title.toLowerCase().contains(query) ||
           note.fileName.toLowerCase().contains(query);
-      final inFolder = note.folderName.toLowerCase().contains(query);
+      final inFolder = note.folderName.toLowerCase().contains(query) ||
+          (note.comboTrack?.toLowerCase().contains(query) ?? false);
       final inContent = note.rawContent.toLowerCase().contains(query);
 
       bool isMatch = false;
@@ -140,7 +142,17 @@ class NoteProvider extends ChangeNotifier {
     for (final note in filteredNotes) {
       groups.putIfAbsent(note.folderName, () => []).add(note);
     }
-    return groups;
+
+    // Đảm bảo thứ tự học kỳ luôn chuẩn tự nhiên: Kỳ 0 -> Kỳ 9 -> Tổng quan
+    final sortedKeys = groups.keys.toList()
+      ..sort((a, b) {
+        final semA = FileService.getSemesterOrder(a);
+        final semB = FileService.getSemesterOrder(b);
+        if (semA != semB) return semA.compareTo(semB);
+        return a.compareTo(b);
+      });
+
+    return {for (final key in sortedKeys) key: groups[key]!};
   }
 
   /// Cập nhật từ khóa tìm kiếm
@@ -247,15 +259,17 @@ class NoteProvider extends ChangeNotifier {
     }
   }
 
-  /// Chọn note bằng liên kết dạng [[TenMon]]
+  /// Chọn note bằng liên kết dạng [[TenMon]] hoặc tên môn thô
   bool selectNoteByLink(String link) {
-    final target = getNoteByFileName(link);
+    final cleanLink = link.replaceAll(RegExp(r'[\[\]]'), '').trim();
+    final targetKey = cleanLink.contains('|') ? cleanLink.split('|').first.trim() : cleanLink;
+    final target = getNoteByFileName(targetKey);
     if (target != null) {
       selectNote(target);
       return true;
     }
     // Fallback: đường dẫn tương đối kiểu "Kỳ 8/PRM393.md"
-    return selectNoteBySourcePath(link);
+    return selectNoteBySourcePath(targetKey);
   }
 
   /// Mở note theo đường dẫn tương đối KB / tên file (additive helper cho RAG sources).

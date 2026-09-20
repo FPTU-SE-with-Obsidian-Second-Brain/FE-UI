@@ -43,6 +43,11 @@ class SecondBrainApp extends StatelessWidget {
             surfaceContainerHighest: Color(0xFF27272A),
             onSurface: Color(0xFFF4F4F5),
           ),
+          textSelectionTheme: const TextSelectionThemeData(
+            selectionColor: Color(0x669333EA),
+            cursorColor: Color(0xFFA855F7),
+            selectionHandleColor: Color(0xFF9333EA),
+          ),
           scaffoldBackgroundColor: const Color(0xFF09090B),
           dividerColor: const Color(0xFF27272A),
           cardColor: const Color(0xFF18181B),

@@ -199,4 +199,18 @@ class MarkdownTableConverter {
 
     return result;
   }
+
+  /// Chuyển đổi liên kết hai chiều [[Page]] hoặc [[Page|Alias]] sang dạng markdown link chuẩn [Alias](Page)
+  /// Giúp giao diện Markdown hiển thị gọn gàng không bị dính ký tự [[ ]] và vẫn click chuyển trang mượt mà.
+  static String formatWikiLinks(String content) {
+    return content.replaceAllMapped(
+      RegExp(r'\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]'),
+      (match) {
+        final target = match.group(1)!.trim();
+        final alias = match.group(2)?.trim();
+        final display = (alias != null && alias.isNotEmpty) ? alias : target;
+        return '[$display]($target)';
+      },
+    );
+  }
 }

@@ -40,8 +40,20 @@ void main() {
 
   test('FileService extractLinks extracts [[...]] correctly', () {
     final service = FileService();
-    const sample = 'Học xong môn [[PRF192]] rồi sẽ học [[PRO192]] và [[CSD201]]. Không lấy [link thường].';
+    const sample = 'Học xong môn [[PRF192]] rồi sẽ học [[PRO192]] và [[CSD201|Data Structures]]. Không lấy [link thường].';
     final links = service.extractLinks(sample);
     expect(links, ['PRF192', 'PRO192', 'CSD201']);
+  });
+
+  test('FileService.getSemesterOrder orders semesters chronologically', () {
+    final folders = ['Tổng quan', 'Kỳ 5', 'Kỳ 1', 'Kỳ 0', 'Kỳ 9', 'Kỳ 2'];
+    folders.sort((a, b) => FileService.getSemesterOrder(a).compareTo(FileService.getSemesterOrder(b)));
+    expect(folders, ['Kỳ 0', 'Kỳ 1', 'Kỳ 2', 'Kỳ 5', 'Kỳ 9', 'Tổng quan']);
+  });
+
+  test('MarkdownTableConverter.formatWikiLinks formats wikilinks to clean markdown links', () {
+    const raw = 'Môn học [[COV121]] và [[PRM393|Mobile Programming]].';
+    final formatted = MarkdownTableConverter.formatWikiLinks(raw);
+    expect(formatted, 'Môn học [COV121](COV121) và [Mobile Programming](PRM393).');
   });
 }

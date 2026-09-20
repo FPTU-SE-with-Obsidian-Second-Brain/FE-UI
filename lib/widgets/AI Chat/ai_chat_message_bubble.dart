@@ -170,14 +170,55 @@ class AiChatMessageBubble extends StatelessWidget {
                       data: message.text,
                       selectable: true,
                       styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
-                        p: const TextStyle(fontSize: 12.5, height: 1.5),
-                        code: const TextStyle(
+                        p: TextStyle(
+                          fontSize: 12.5,
+                          height: 1.5,
+                          color: colorScheme.onSurface,
+                        ),
+                        strong: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface,
+                        ),
+                        em: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          color: colorScheme.onSurface,
+                        ),
+                        blockquote: TextStyle(
+                          fontSize: 12.5,
+                          height: 1.55,
+                          color: colorScheme.onSurface,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        blockquoteDecoration: BoxDecoration(
+                          color: colorScheme.primary.withAlpha(25),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border(
+                            left: BorderSide(
+                              color: colorScheme.primary,
+                              width: 3.5,
+                            ),
+                          ),
+                        ),
+                        blockquotePadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        code: TextStyle(
                           fontSize: 11.5,
                           fontFamily: 'monospace',
+                          color: colorScheme.secondary,
+                          backgroundColor: colorScheme.surfaceContainerHighest,
                         ),
                         codeblockDecoration: BoxDecoration(
                           color: colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: theme.dividerColor.withAlpha(80),
+                          ),
+                        ),
+                        listBullet: TextStyle(
+                          fontSize: 12.5,
+                          color: colorScheme.primary,
                         ),
                       ),
                     ),

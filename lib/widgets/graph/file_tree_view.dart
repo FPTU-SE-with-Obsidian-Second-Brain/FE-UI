@@ -41,15 +41,15 @@ class FileTreeView extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Vui lòng chọn thư mục chứa các file .md của bạn',
+                    'Không tìm thấy thư mục giáo trình chuẩn.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey, fontSize: 13),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
-                    onPressed: () => provider.pickFolder(),
-                    icon: const Icon(Icons.folder),
-                    label: const Text('Chọn thư mục'),
+                    onPressed: () => provider.init(),
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Tải lại dữ liệu'),
                   ),
                 ],
               ),
@@ -283,28 +283,69 @@ class _FolderGroupState extends State<_FolderGroup> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (note.links.isNotEmpty)
+                if (note.comboTrack != null) ...[
+                  const SizedBox(width: 4),
                   Tooltip(
-                    message: '${note.links.length} liên kết [[...]]',
+                    message: note.fullFolderPath ?? note.comboTrack!,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 5,
                         vertical: 1,
                       ),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.secondary.withAlpha(30),
+                        color: theme.colorScheme.primary.withAlpha(25),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        '[[${note.links.length}]]',
+                        note.comboTrack!,
                         style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.secondary,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w500,
+                          color: theme.colorScheme.primary,
                         ),
                       ),
                     ),
                   ),
+                ],
+                if (note.links.isNotEmpty) ...[
+                  const SizedBox(width: 4),
+                  Tooltip(
+                    message: '${note.links.length} liên kết môn học',
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1.5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.secondary.withAlpha(25),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: theme.colorScheme.secondary.withAlpha(60),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.link_rounded,
+                            size: 11,
+                            color: theme.colorScheme.secondary,
+                          ),
+                          const SizedBox(width: 2.5),
+                          Text(
+                            '${note.links.length}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.secondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

@@ -146,54 +146,80 @@ class _MarkdownSelectionToolbarState extends State<MarkdownSelectionToolbar> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Thanh Quick Actions luôn thấy — hiện rõ khi đã bôi đen đủ dài
-        Material(
-          color: colorScheme.surfaceContainerHighest.withAlpha(
-            _hasSelection ? 160 : 70,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.auto_awesome,
-                  size: 14,
-                  color: _hasSelection
-                      ? colorScheme.primary
-                      : theme.hintColor,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    _hasSelection
-                        ? 'Đã chọn ${_excerpt.length} ký tự — chọn hành động AI:'
-                        : 'Bôi đen đoạn văn (≥12 ký tự) hoặc chuột phải → Quick Actions',
-                    style: TextStyle(
-                      fontSize: 11.5,
-                      color: _hasSelection
-                          ? colorScheme.onSurface
-                          : theme.hintColor,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                _ActionChipBtn(
-                  label: 'Giải thích',
-                  enabled: _hasSelection,
-                  onTap: () => _runAction('explain'),
-                ),
-                _ActionChipBtn(
-                  label: 'Dịch VI',
-                  enabled: _hasSelection,
-                  onTap: () => _runAction('translate_vi'),
-                ),
-                _ActionChipBtn(
-                  label: 'Tóm tắt',
-                  enabled: _hasSelection,
-                  onTap: () => _runAction('summarize'),
-                ),
-              ],
+        // Thanh Quick Actions luôn thấy — sáng rõ, nổi bật các nút AI
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          decoration: BoxDecoration(
+            color: _hasSelection
+                ? colorScheme.surfaceContainerHighest
+                : colorScheme.surface.withAlpha(220),
+            border: Border(
+              bottom: BorderSide(
+                color: _hasSelection
+                    ? colorScheme.primary.withAlpha(160)
+                    : theme.dividerColor.withAlpha(90),
+                width: _hasSelection ? 1.5 : 1,
+              ),
             ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: _hasSelection
+                      ? colorScheme.primary.withAlpha(50)
+                      : colorScheme.primary.withAlpha(20),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(
+                  Icons.auto_awesome,
+                  size: 15,
+                  color: _hasSelection
+                      ? colorScheme.secondary
+                      : colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _hasSelection
+                      ? 'Đã chọn ${_excerpt.length} ký tự — sẵn sàng chạy AI:'
+                      : 'Bôi đen đoạn văn (≥12 ký tự) hoặc chọn nhanh:',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: _hasSelection ? FontWeight.w600 : FontWeight.normal,
+                    color: _hasSelection
+                        ? colorScheme.onSurface
+                        : theme.hintColor,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              _ActionChipBtn(
+                label: 'Giải thích',
+                icon: Icons.lightbulb_rounded,
+                enabled: _hasSelection,
+                accentColor: const Color(0xFFF59E0B),
+                onTap: () => _runAction('explain'),
+              ),
+              _ActionChipBtn(
+                label: 'Dịch VI',
+                icon: Icons.translate_rounded,
+                enabled: _hasSelection,
+                accentColor: const Color(0xFF38BDF8),
+                onTap: () => _runAction('translate_vi'),
+              ),
+              _ActionChipBtn(
+                label: 'Tóm tắt',
+                icon: Icons.summarize_rounded,
+                enabled: _hasSelection,
+                accentColor: const Color(0xFF34D399),
+                onTap: () => _runAction('summarize'),
+              ),
+            ],
           ),
         ),
 
@@ -215,28 +241,68 @@ class _MarkdownSelectionToolbarState extends State<MarkdownSelectionToolbar> {
 
 class _ActionChipBtn extends StatelessWidget {
   final String label;
+  final IconData icon;
   final bool enabled;
+  final Color accentColor;
   final VoidCallback onTap;
 
   const _ActionChipBtn({
     required this.label,
+    required this.icon,
     required this.enabled,
+    required this.accentColor,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4),
-      child: TextButton(
-        onPressed: enabled ? onTap : null,
-        style: TextButton.styleFrom(
-          visualDensity: VisualDensity.compact,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          minimumSize: const Size(0, 28),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      padding: const EdgeInsets.only(left: 6),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: accentColor.withAlpha(enabled ? 65 : 28),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: accentColor.withAlpha(enabled ? 240 : 130),
+                width: enabled ? 1.5 : 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: accentColor.withAlpha(enabled ? 90 : 35),
+                  blurRadius: enabled ? 8 : 4,
+                  offset: const Offset(0, 1.5),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: 13.5,
+                  color: enabled ? Colors.white : accentColor,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: enabled ? FontWeight.bold : FontWeight.w600,
+                    color: enabled ? Colors.white : const Color(0xFFF4F4F5),
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        child: Text(label, style: const TextStyle(fontSize: 11)),
       ),
     );
   }

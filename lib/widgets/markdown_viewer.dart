@@ -67,15 +67,30 @@ class MarkdownViewer extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: colorScheme.primary.withAlpha(30),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Text(
-                          note.folderName,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.primary,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              note.folderName.contains('Kỳ')
+                                  ? Icons.school_outlined
+                                  : Icons.folder_outlined,
+                              size: 13,
+                              color: colorScheme.primary,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              note.comboTrack != null
+                                  ? '${note.folderName} › ${note.comboTrack}'
+                                  : note.folderName,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -113,14 +128,27 @@ class MarkdownViewer extends StatelessWidget {
                       runSpacing: 4,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Text(
-                          'Liên kết [[ ]]:',
-                          style: TextStyle(fontSize: 11, color: theme.hintColor),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.link_rounded, size: 14, color: theme.hintColor),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Môn liên kết:',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w500,
+                                color: theme.hintColor,
+                              ),
+                            ),
+                          ],
                         ),
                         ...note.links.map((link) {
+                          final cleanLink = link.replaceAll(RegExp(r'[\[\]]'), '').trim();
                           return ActionChip(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                            label: Text('[[$link]]'),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+                            avatar: Icon(Icons.link_rounded, size: 12, color: colorScheme.primary),
+                            label: Text(cleanLink),
                             labelStyle: TextStyle(
                               fontSize: 11,
                               color: colorScheme.primary,
@@ -129,11 +157,11 @@ class MarkdownViewer extends StatelessWidget {
                             backgroundColor: colorScheme.primary.withAlpha(25),
                             side: BorderSide(color: colorScheme.primary.withAlpha(80)),
                             onPressed: () {
-                              final found = provider.selectNoteByLink(link);
+                              final found = provider.selectNoteByLink(cleanLink);
                               if (!found) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('Không tìm thấy môn học: $link'),
+                                    content: Text('Không tìm thấy môn học: $cleanLink'),
                                     duration: const Duration(seconds: 2),
                                   ),
                                 );
@@ -153,7 +181,9 @@ class MarkdownViewer extends StatelessWidget {
               child: MarkdownSelectionToolbar(
                 note: note,
                 child: Markdown(
-                  data: MarkdownTableConverter.cleanAllHtml(note.rawContent),
+                  data: MarkdownTableConverter.formatWikiLinks(
+                    MarkdownTableConverter.cleanAllHtml(note.rawContent),
+                  ),
                   // false: SelectionArea (Quick Actions) làm chủ selection.
                   // true sẽ tạo SelectableText lồng nhau → onSelectionChanged không chạy.
                   selectable: false,
@@ -187,6 +217,26 @@ class MarkdownViewer extends StatelessWidget {
                       color: colorScheme.surfaceContainerHighest.withAlpha(90),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: theme.dividerColor.withAlpha(80)),
+                    ),
+                    blockquote: TextStyle(
+                      fontSize: 13.5,
+                      height: 1.6,
+                      color: colorScheme.onSurface.withAlpha(230),
+                      fontStyle: FontStyle.italic,
+                    ),
+                    blockquoteDecoration: BoxDecoration(
+                      color: colorScheme.primary.withAlpha(20),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border(
+                        left: BorderSide(
+                          color: colorScheme.primary,
+                          width: 3.5,
+                        ),
+                      ),
+                    ),
+                    blockquotePadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
                     ),
                     tableBorder: TableBorder.all(
                       color: theme.dividerColor.withAlpha(100),

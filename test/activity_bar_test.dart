@@ -68,8 +68,8 @@ void main() {
     expect(find.byIcon(Icons.refresh_rounded), findsOneWidget); // Reload
     expect(
       find.byIcon(Icons.folder_open_outlined),
-      findsOneWidget,
-    ); // Open Folder
+      findsNothing,
+    ); // Open Folder removed to protect data integrity
     expect(find.byIcon(Icons.settings_outlined), findsOneWidget); // Settings
 
     // Tap Search tab
